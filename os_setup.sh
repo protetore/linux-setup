@@ -1,5 +1,7 @@
 #!/bin/bash
 
+user=$(whoami)
+
 sudo apt-get update
 
 # My tools and eye-candy
@@ -118,3 +120,16 @@ tar -xf idea-comm.tar.gz -C ~/Apps/Idea --strip 1
 # Atom
 wget -O atom-latest.deb https://atom.io/download/deb
 dpkg -i atom-latest.deb
+
+# ###############
+# Lang Parsers
+# ###############
+
+# For python code fixing and beautify (in atom too)
+pip install --upgrade autopep8 
+sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
+
+# For php code fixing and beautify (in atom too)
+curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
+chmod +x php-cs-fixer
+mv php-cs-fixer /usr/bin/
