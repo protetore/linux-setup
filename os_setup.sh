@@ -65,7 +65,7 @@ else
          git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     }
     export PS1="\u@\h \[\033[1;34m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
-    EOF
+EOF
 fi
 
   
@@ -81,6 +81,12 @@ for type in Bold Light Medium Regular Retina; do
     "https://github.com/tonsky/FiraCode/blob/master/distr/ttf/FiraCode-${type}.ttf?raw=true";
 done
 fc-cache -f
+
+# Configure Tilda
+if [ -f ./tilda_config ]; then
+    rm -f ~/.config/tilda/*
+    cp ./tildaconfig ~/.config/tilda/config_0
+fi
 
 # Icons
 # http://0rax0.deviantart.com/art/Uniform-Icon-Theme-453054609
@@ -133,3 +139,65 @@ sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
 curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
 chmod +x php-cs-fixer
 mv php-cs-fixer /usr/bin/
+
+# ###############
+# Atom Config
+# ###############
+
+if [ -f ~/.atom/keymap.cson ]; then
+  cat <<EOF >> ~/.atom/keymap.cson
+  'atom-text-editor[data-grammar~="vue"]:not([mini])':
+   'tab': 'emmet:expand-abbreviation-with-tab'
+
+  'atom-text-editor[data-grammar~="css"]:not([mini])':
+   'tab': 'emmet:expand-abbreviation-with-tab'
+
+  'atom-text-editor[data-grammar~="html"]:not([mini])':
+   'tab': 'emmet:expand-abbreviation-with-tab'
+EOF
+fi
+
+if [ -f ~/.atom/config.cson ]; then
+  cat <<EOF >> ~/.atom/config.cson
+  "*":
+    "atom-beautify":
+      js:
+        beautify_on_save: true
+      json:
+        beautify_on_save: true
+      less:
+        beautify_on_save: true
+      markdown:
+        beautify_on_save: true
+      nginx:
+        beautify_on_save: true
+      php:
+        beautify_on_save: true
+      python:
+        beautify_on_save: true
+      sass:
+        beautify_on_save: true
+      scss:
+        beautify_on_save: true
+      vue:
+        beautify_on_save: true
+      xml:
+        beautify_on_save: true
+      yaml:
+        beautify_on_save: true
+    core:
+      autoHideMenuBar: true
+      telemetryConsent: "no"
+      themes: [
+        "one-dark-ui"
+        "firewatch-syntax"
+      ]
+    editor:
+      fontFamily: "Fira Code"
+    "exception-reporting":
+      userId: "1fe51ccf-b1c7-4e08-9d74-bbe684d2fa1e"
+    welcome:
+      showOnStartup: false
+EOF
+fi
+
