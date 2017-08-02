@@ -5,6 +5,7 @@ parse_git_branch() {
 export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
 
 # History search shorcuts (arrow keys)
+# Start typing and press the arrows only that word
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 bind '"\e0A": history-search-backward'
