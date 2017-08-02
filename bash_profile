@@ -9,3 +9,8 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 bind '"\e0A": history-search-backward'
 bind '"\e0B": history-search-forward'
+
+# Docker local dev network so containers can communicate by name
+export DOCKER_NET=dev
+alias drun="docker run --net=$DOCKER_NET --dns-search=$DOCKER_NET"
+
