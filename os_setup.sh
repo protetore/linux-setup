@@ -11,6 +11,7 @@ sudo apt install -y vim \
   git \
   byobu \
   docky \
+  dconf-cli \
   numix-gtk-theme \
   numix-folders \
   numix-icon-theme-square \
@@ -39,14 +40,13 @@ sudo add-apt-repository \
  $(lsb_release -cs) \
  stable"
  
- sudo apt-get update
- sudo apt-get install docker-ce
+sudo apt-get update
+sudo apt-get install docker-ce
 
 # ###############
 # Bash Tricks
 # ###############
 
-# Git branch on prompt
 echo "Configuring custom prompt..."
 BASH_CONFIG=""
 if [ -f ~/.bash_profile ]; then 
@@ -58,22 +58,33 @@ elif [ -f ~/.bash_profile ]; then
 fi
 
 if [ "$BASH_CONFIG" == "" ]; then
-    echo "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"
-else    
-    cat <<EOF >> $BASH_CONFIG
-    # Display git branch in the prompt
-    parse_git_branch() {
-         git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-    }
-    export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
-
-    # History search shorcuts (arrow keys)
-    bind '"\e[A": history-search-backward'
-    bind '"\e[B": history-search-forward'
-    bind '"\e0A": history-search-backward'
-    bind '"\e0B": history-search-forward'
-EOF
+    echo "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"  
+    exit 1
 fi
+
+# Easy history navigation
+cat <<EOF >> $BASH_CONFIG
+# History search shorcuts (arrow keys)
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\e0A": history-search-backward'
+bind '"\e0B": history-search-forward'
+EOF
+
+# Flat colors terminal (ex.: 33 (Dracula))
+wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh
+wget -O xt  http://git.io/v3DR0 && chmod +x xt && ./xt && rm xt
+wget -O xt  http://git.io/v3D8R && chmod +x xt && ./xt && rm xt
+wget -O xt  http://git.io/v3DBT && chmod +x xt && ./xt && rm xt
+wget -O xt  http://git.io/v3Dlz && chmod +x xt && ./xt && rm xt
+wget -O xt  http://git.io/v3Dlm && chmod +x xt && ./xt && rm xt
+wget -O xt  http://git.io/v3DBP && chmod +x xt && ./xt && rm xt
+wget -O xt https://git.io/v7eBS && chmod +x xt && ./xt && rm xt # Gruvbox Dark
+wget -O xt  http://git.io/vs7Ut && chmod +x xt && ./xt && rm xt # One Dark
+wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
+wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
+wget -O xt  http://git.io/v3D4o && chmod +x xt && ./xt && rm xt # Freya
+
 
   
 # ###############
@@ -124,6 +135,27 @@ sudo apt install graphviz
 # ###############
 # Developer Tools
 # ###############
+
+# Git branch on prompt (no dependencies)
+cat <<EOF >> $BASH_CONFIG
+# Git helpers
+git_update(){
+    git checkout master && git pull && git checkout - && git rebase master
+}
+# Display git branch in the prompt
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
+EOF
+
+# Git Prompt (depends on bash-git-prompt)
+cd ~
+git clone https://github.com/magicmonty/bash-git-prompt.git .bash-git-prompt --depth=1
+echo "# Git Prompt" >> ~/.bash_profile
+echo "GIT_PROMPT_ONLY_IN_REPO=1" >> ~/.bash_profile
+echo "GIT_PROMPT_THEME=Single_line_Ubuntu" >> ~/.bash_profile
+echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile 
 
 # Idea
 mkdir -p ~/Apps/Idea
