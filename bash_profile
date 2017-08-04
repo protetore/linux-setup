@@ -24,3 +24,10 @@ GIT_PROMPT_ONLY_IN_REPO=1
 GIT_PROMPT_THEME=Single_line_Ubuntu
 source ~/.bash-git-prompt/gitprompt.sh
 
+# Shorcuts
+export W=~/$USER/Workspace
+export WORKSPACE=$W
+
+# SSH
+# Warning: SSH will stop warning you if server hash changes, use carefully
+SSH_OPTS=" -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null "
