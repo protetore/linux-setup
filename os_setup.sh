@@ -19,7 +19,8 @@ sudo apt install -y vim \
   numix-icon-theme \
   numix-blue-gtk-theme \
   slack-desktop \
-  build-essential
+  build-essential \
+  opera-stable
 
 # ###############
 # Docker CE
