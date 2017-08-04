@@ -35,3 +35,12 @@ Tilda Drop Down Terminal
 - https://github.com/lanoxx/tilda
 - sudo apt install tilda
 - byobu as starting cmd
+
+# Fonts
+
+FiraCode
+
+# Monitor Color Warmith
+sudo add-apt-repository ppa:nathan-renniewaldock/flux
+sudo apt-get update
+sudo apt-get install fluxgui

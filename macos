@@ -14,3 +14,9 @@ wget -O xt  http://git.io/vs7Ut && chmod +x xt && ./xt && rm xt # One Dark
 wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
 wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
 wget -O xt  http://git.io/v3D4o && chmod +x xt && ./xt && rm xt # Freya
+
+# Apps
+Amphetamine
+CyberDuck
+Ulysses
+
