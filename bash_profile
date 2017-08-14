@@ -1,6 +1,10 @@
 # Git helpers
-git_update(){
+git_up(){
     git checkout master && git pull && git checkout - && git rebase master
+}
+
+git_undo(){
+    git reset HEAD~
 }
 
 # Display git branch in the prompt
