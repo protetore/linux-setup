@@ -44,3 +44,10 @@ FiraCode
 sudo add-apt-repository ppa:nathan-renniewaldock/flux
 sudo apt-get update
 sudo apt-get install fluxgui
+
+# Firefox
+
+VivaldiFox Add-on
+- Dark Theme
+- Use Astralis Tab = False
+- Use page colors UI = False
