@@ -70,3 +70,28 @@ sudo apt-get install fluxgui
     - Use page colors UI = False
     
 - **Opera**
+
+## Comand Aliases
+
+Helpful git aliases (see bash_profile for referenced functions):
+
+```sh
+alias gc='git commit -m'
+alias gcm='git add -A && git commit -m'
+alias gp='git pull origin $(git_branch)'
+alias gcb='git checkou -b'
+alias gsave='git add -A && git commit -m "SAVEPOINT"'
+alias gundo='git reset HEAD~ --mixed'
+alias gamend='git commit -a --amend'
+alias gwipe='git add -A && git commit -qm "WIPE SAVEPOINT" && git reset HEAD~1 --hard'
+alias gclean='git_clean'
+alias gdone='git_done'
+```
+
+## Custom Promt
+
+Display the git branch on terminal prompt:
+
+```sh
+export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
+```

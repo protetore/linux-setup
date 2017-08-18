@@ -1,3 +1,6 @@
+PERSONAL_WORKSPACE=__PERSONAL__
+JOB_WORKSPACE=__COMPANY__
+
 # #################
 # Git helpers
 # #################
@@ -67,17 +70,17 @@ bind '"\e0B": history-search-forward'
 
 # Docker local dev network so containers can communicate by name
 export DOCKER_NET=dev
-alias drun="docker run --net=dev --dns-search=dev"
+alias drun="docker run --net=${DOCKER_NET} --dns-search=${DOCKER_NET}"
 
 # Shorcuts
 export W=~/Workspace/
 export WORKSPACE=$W
 alias w="cd $W"
-alias p="cd $W/protetore.net"
+alias p="cd $W/${PERSONAL_WORKSPACE}"
 
 # Work
-export WCV=$W/commodityvectors.com/
-alias wcv="cd $WCV"
+export WW=$W/${JOB_WORKSPACE}/
+alias ww="cd $WW"
 
 # ################
 # SSH

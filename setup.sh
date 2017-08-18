@@ -1,10 +1,23 @@
 #!/bin/bash
 
-user=$(whoami)
+if [ -L $0 ];
+then
+    BASEDIR=$(dirname $(readlink $0))
+else
+    BASEDIR="$(cd "$(dirname "$0")" && pwd -P)"
+fi
 
+USER_WORKSPACE=${1-user}
+JOB_WORKSPACE=${2-yourcompany.com}
+
+echo "Packages Install"
+
+# Prepare
+echo "- Updating package manager..."
 sudo apt-get update
 
 # My tools and eye-candy
+echo "- Installing basic packages..."
 sudo apt install -y vim \
   gnome gnome-shell \
   tilda \
@@ -27,7 +40,9 @@ sudo apt install -y vim \
 # Bash Tricks
 # ###############
 
-echo "Configuring custom prompt..."
+echo "Command Line Customizations"
+
+echo "- Configuring bash and command aliases..."
 BASH_CONFIG=""
 if [ -f ~/.bash_profile ]; then 
     BASH_CONFIG=~/.bash_profile
@@ -42,8 +57,8 @@ if [ "$BASH_CONFIG" == "" ]; then
     exit 1
 fi
 
-if [ -f ./bash_profile ]; then
-    cp ./bash_profile $BASH_CONFIG
+if [ -f ./bash_config ]; then
+    cp ./bash_config $BASH_CONFIG
     . $BASH_CONFIG
 fi
 
@@ -52,7 +67,10 @@ fi
 # Customization
 # ###############
 
+echo "Visual Customizations
+
 # Install FiraCode font
+echo "- Installing FiraCode dev font..."
 echo "Configuring custom font 'Fira Code'..."
 mkdir -p ~/.local/share/fonts
 for type in Bold Light Medium Regular Retina; do
@@ -62,12 +80,14 @@ done
 fc-cache -f
 
 # Configure Tilda
+echo "- Installing tilda drop down terminal..."
 if [ -f ./tilda_config ]; then
     rm -f ~/.config/tilda/*
     cp ./tildaconfig ~/.config/tilda/config_0
 fi
 
 # Flat colors terminal (ex.: 33 (Dracula))
+echo "- Customizing default terminal colors..."
 wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh
 wget -O xt  http://git.io/v3DR0 && chmod +x xt && ./xt && rm xt
 wget -O xt  http://git.io/v3D8R && chmod +x xt && ./xt && rm xt
@@ -85,6 +105,7 @@ wget -O xt  http://git.io/v3D4o && chmod +x xt && ./xt && rm xt # Freya
 # http://0rax0.deviantart.com/art/Uniform-Icon-Theme-453054609
 
 # Monitor Color Warmith
+echo "- Installing flux do control monitor color warmth..."
 sudo add-apt-repository ppa:nathan-renniewaldock/flux
 sudo apt-get update
 sudo apt-get install fluxgui
@@ -97,15 +118,20 @@ sudo apt-get install fluxgui
 # Prog Languages
 # ###############
 
+echo "Development Languages/Tools"
+
 # Install languages and it's tools
-sudo apt install -y pip virtualenv scala
+echo "- Installing php, python tools and scala..."
+sudo apt install -y php-all-dev pip virtualenv scala
 
 # Nodejs and nvm
+echo "- Installing nodejs and nvm..."
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
 
 # Install sbt 
+echo "- Installing sbt..."
 echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
 sudo apt-get update
@@ -113,14 +139,38 @@ sudo apt-get install sbt
 sbt -mem 4000
 
 # Graphviz for graph generation
+echo "- Installing graphviz..."
 sudo apt install graphviz
+
+# PHP Composer
+echo "- Installing php composer..."
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('SHA384', 'composer-setup.php') === '669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+sudo mv ./composer.phar /usr/local/bin/composer
+sudo chmod +x /usr/local/bin/composer
+
+# For python code fixing and beautify (in atom too)
+echo "- Installing autopep8..."
+pip install --upgrade autopep8 
+sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
+
+# For php code fixing and beautify (in atom too)
+echo "- Installing php-cs-fixes..."
+curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
+chmod +x php-cs-fixer
+mv php-cs-fixer /usr/bin/
 
 
 # ###############
 # Developer Tools
 # ###############
 
+echo "Developer Tools"
+
 # Git Prompt (depends on bash-git-prompt)
+echo "- Installing gitprompt..."
 cd ~
 git clone https://github.com/magicmonty/bash-git-prompt.git .bash-git-prompt --depth=1
 echo "# Git Prompt" >> ~/.bash_profile
@@ -129,32 +179,22 @@ echo "GIT_PROMPT_THEME=Single_line_Ubuntu" >> ~/.bash_profile
 echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile 
 
 # Idea
+echo "- Installing IntelliJ Idea Community..."
 mkdir -p ~/Apps/Idea
 wget -O idea-comm.tar.gz https://www.jetbrains.com/idea/download/download-thanks.html?platform=linux&code=IIC
 tar -xf idea-comm.tar.gz -C ~/Apps/Idea --strip 1
 
 # Atom
+echo "- Installing Atom..."
 wget -O atom-latest.deb https://atom.io/download/deb
 dpkg -i atom-latest.deb
 
 
 # ###############
-# Lang Parsers
-# ###############
-
-# For python code fixing and beautify (in atom too)
-pip install --upgrade autopep8 
-sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
-
-# For php code fixing and beautify (in atom too)
-curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
-chmod +x php-cs-fixer
-mv php-cs-fixer /usr/bin/
-
-
-# ###############
 # Atom Config
 # ###############
+
+echo "- Configuring Atom..."
 
 if [ -f ~/.atom/keymap.cson ]; then
   cat <<EOF >> ~/.atom/keymap.cson
@@ -218,6 +258,10 @@ fi
 # Docker CE
 # ###############
 
+echo "Docker"
+
+echo "- Installing Requirements..."
+
 sudo apt-get install -y \
   linux-image-extra-$(uname -r) \
   linux-image-extra-virtual \
@@ -225,13 +269,28 @@ sudo apt-get install -y \
   ca-certificates \
   curl \
   software-properties-common
-    
+   
+echo "- Adding apt-key..."
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
+echo "- Adding reository..."
 sudo add-apt-repository \
  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
  $(lsb_release -cs) \
  stable"
- 
+
+echo "- Instaling docker..."
 sudo apt-get update
 sudo apt-get install docker-ce
+
+# Use docker without sudo
+echo "- Allowing user to use docker without sudo..."
+sudo usermod -aG docker $USER
+newgrp
+sudo systemctl restart docker
+
+echo
+echo "# ######## #
+echo "# FINISHED #"
+echo "# ######## #
+echo
