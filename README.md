@@ -75,6 +75,7 @@ sudo apt-get install fluxgui
 
 Helpful git aliases (see bash_profile for referenced functions):
 
+**Bash**
 ```sh
 alias gc='git commit -m'
 alias gcm='git add -A && git commit -m'
@@ -88,6 +89,23 @@ alias gclean='git_clean'
 alias gdone='git_done'
 ```
 
+**Git** (~/.gitconfig)
+```sh
+[alias]
+    up = !git pull --rebase --prune --autostash $@ git submodule update --init --recursive
+    co = checkout
+    ec = config --global -e
+    cb = checkout -b
+    cm = !git add -A && git commit -m
+    save = !git add -A && git commit -m 'SAVEPOINT'
+    wip = !git add -u && git commit -m "WIP"
+    undo = reset HEAD~1 --mixed
+    amend = commit -a --amend
+    wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
+    clean = "!f() { git branch --merged ${1-master} | grep -v " ${1-master}$" | xargs -r git branch -d; }; f"
+    done = "!f() { git checkout ${1-master} && git up && git bclean ${1-master}; }; f"
+```
+
 ## Custom Promt
 
 Display the git branch on terminal prompt:
@@ -95,3 +113,12 @@ Display the git branch on terminal prompt:
 ```sh
 export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
 ```
+
+## Dev Tools
+
+- Atom
+- IntelliJ Idea Community
+- PHP, php-cs-fixer, composer
+- Python, pip, virtualenv, autopep8
+- NodeJS, nvm
+- Scala, sbt
