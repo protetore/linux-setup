@@ -1,5 +1,49 @@
 #!/bin/bash
 
+# Regular Colors [Foreground]
+NC='\033[0m' # No Color
+GRAY='\033[0;37m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+YELLOW='\033[1;33m'
+LIGHTBLUE='\033[0;94m'
+WHITE='\033[1;37m'
+
+decho() {
+    printf "$1\n"
+}
+
+dtitle() {
+    title=$(echo $1 | tr '[:lower:]' '[:upper:]')
+    printf "${YELLOW}$title${NC}\n"
+}
+
+dsub() {
+    printf "${CYAN}@ ${1}${NC}\n"
+}
+
+dstep() {
+    printf "${NC}  - $1${NC}\n"
+}
+
+dstep2() {
+    printf "${NC}    - $1${NC}\n"
+}
+
+derror() {
+    printf "${RED}[ERROR] $1${NC}\n"
+}
+
+execute() {
+    out=$($@)
+    if [ ! $? -eq 0 ]; then
+        echo -n "$out"
+        exit 1
+    fi
+}
+
 if [ -L $0 ];
 then
     BASEDIR=$(dirname $(readlink $0))
@@ -10,39 +54,67 @@ fi
 USER_WORKSPACE=${1-user}
 JOB_WORKSPACE=${2-yourcompany.com}
 
-echo "Packages Install"
+echo "# ################### #"
+echo "# Linux Customization #"
+echo "# ~Automation Script~ #"
+echo "# ################### #"
+echo
+dtitle "Packages Install"
 
 # Prepare
-echo "- Updating package manager..."
-sudo apt-get update
+dsub "Updating package manager..."
+
+execute sudo apt-get update
 
 # My tools and eye-candy
-echo "- Installing basic packages..."
-sudo apt install -y vim \
-  gnome gnome-shell \
-  tilda \
-  git \
-  byobu \
-  docky \
-  dconf-cli \
-  numix-gtk-theme \
-  numix-folders \
-  numix-icon-theme-square \
-  numix-icon-theme-circle \
-  numix-icon-theme \
-  numix-blue-gtk-theme \
-  slack-desktop \
-  build-essential \
-  opera-stable
+dsub "Installing basic packages..."
+execute sudo apt install -y --allow-unauthenticated \
+    vim \
+    curl \
+    tilda \
+    git \
+    byobu \
+    docky \
+    php7.0 \
+    dconf-cli \
+    numix-gtk-theme \
+    numix-icon-theme \
+    build-essential \
+    dirmngr \
+    owncloud-client
+  
+# Ubuntu only
+# sudo apt install -y \
+#     gnome gnome-shell \
+#     numix-folders \
+#     numix-blue-gtk-theme \
+#     opera-stable \
+#     slack-desktop 
 
+# Pure debian: Needs to add opera repo
+dsub "Installing Opera..."
+if [ -f /etc/apt/sources.list.d/opera.list ]; then
+    execute sudo touch /etc/apt/sources.list.d/opera.list
+    echo "deb http://deb.opera.com/opera-stable/ stable non-free" | sudo tee -a /etc/apt/sources.list.d/opera.list
+    execute sudo apt-get update
+    execute sudo apt-key adv --fetch-keys http://deb.opera.com/archive.key
+    execute sudo apt-get install -y opera-stable
+fi
+
+# Pure debian: Needs to add slack repo
+dsub "Installing Slack..."
+if [ ! $(which slack) ]; then
+    execute curl -o /tmp/slack.deb https://downloads.slack-edge.com/linux_releases/slack-desktop-2.7.1-amd64.deb
+    execute sudo apt-get install -y --allow-unauthenticated /tmp/slack.deb
+fi
 
 # ###############
 # Bash Tricks
 # ###############
 
-echo "Command Line Customizations"
+dtitle "Command Line Customizations"
 
-echo "- Configuring bash and command aliases..."
+dsub "Configuring bash and command aliases..."
 BASH_CONFIG=""
 if [ -f ~/.bash_profile ]; then 
     BASH_CONFIG=~/.bash_profile
@@ -53,7 +125,7 @@ elif [ -f ~/.bash_profile ]; then
 fi
 
 if [ "$BASH_CONFIG" == "" ]; then
-    echo "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"  
+    derror "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"  
     exit 1
 fi
 
@@ -67,48 +139,53 @@ fi
 # Customization
 # ###############
 
-echo "Visual Customizations
+dtitle "Visual Customizations"
 
 # Install FiraCode font
-echo "- Installing FiraCode dev font..."
-echo "Configuring custom font 'Fira Code'..."
-mkdir -p ~/.local/share/fonts
-for type in Bold Light Medium Regular Retina; do
-    wget -O ~/.local/share/fonts/FiraCode-${type}.ttf \
-    "https://github.com/tonsky/FiraCode/blob/master/distr/ttf/FiraCode-${type}.ttf?raw=true";
-done
+dsub "Installing FiraCode dev font..."
+if [ ! -z "$(ls ~/.local/share/fonts/FiraCode*.ttf 2> /dev/null)" ]; then
+    dstep "'Fira Code' already installed..."
+else
+    dstep "Configuring custom font 'Fira Code'..."
+    mkdir -p ~/.local/share/fonts
+    for type in Bold Light Medium Regular Retina; do
+        execute wget -qO ~/.local/share/fonts/FiraCode-${type}.ttf \
+        "https://github.com/tonsky/FiraCode/blob/master/distr/ttf/FiraCode-${type}.ttf?raw=true";
+    done
+fi
 fc-cache -f
 
 # Configure Tilda
-echo "- Installing tilda drop down terminal..."
-if [ -f ./tilda_config ]; then
+dsub "Configuring 'tilda' drop down terminal..."
+if [ ! -f ~/.config/tilda/config_0 ]; then
+    dstep "Tilda not configured, setting up..."
     rm -f ~/.config/tilda/*
-    cp ./tildaconfig ~/.config/tilda/config_0
+    cp ./tilda_config ~/.config/tilda/config_0
+else
+    dstep "Tilda already configured"
 fi
 
 # Flat colors terminal (ex.: 33 (Dracula))
-echo "- Customizing default terminal colors..."
-wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh
-wget -O xt  http://git.io/v3DR0 && chmod +x xt && ./xt && rm xt
-wget -O xt  http://git.io/v3D8R && chmod +x xt && ./xt && rm xt
-wget -O xt  http://git.io/v3DBT && chmod +x xt && ./xt && rm xt
-wget -O xt  http://git.io/v3Dlz && chmod +x xt && ./xt && rm xt
-wget -O xt  http://git.io/v3Dlm && chmod +x xt && ./xt && rm xt
-wget -O xt  http://git.io/v3DBP && chmod +x xt && ./xt && rm xt
-wget -O xt https://git.io/v7eBS && chmod +x xt && ./xt && rm xt # Gruvbox Dark
-wget -O xt  http://git.io/vs7Ut && chmod +x xt && ./xt && rm xt # One Dark
-wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
-wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
-wget -O xt  http://git.io/v3D4o && chmod +x xt && ./xt && rm xt # Freya
+dsub "Customizing default terminal colors..."
+# wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh
+# wget -O xt https://git.io/v7eBS && chmod +x xt && ./xt && rm xt # Gruvbox Dark
+# wget -O xt  http://git.io/vs7Ut && chmod +x xt && ./xt && rm xt # One Dark
+# wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
+# wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
+# Freya:
+execute wget -qO xt http://git.io/v3D4o 
+execute chmod +x xt 
+execute ./xt 
+execute rm xt
 
 # Icons
 # http://0rax0.deviantart.com/art/Uniform-Icon-Theme-453054609
 
 # Monitor Color Warmith
-echo "- Installing flux do control monitor color warmth..."
-sudo add-apt-repository ppa:nathan-renniewaldock/flux
-sudo apt-get update
-sudo apt-get install fluxgui
+# echo "- Installing flux do control monitor color warmth..."
+# execute sudo add-apt-repository ppa:nathan-renniewaldock/flux
+# execute sudo apt-get update
+# execute sudo apt-get install -y --allow-unauthenticated fluxgui
 
 # [MACOS] Terminal/iTerm Flat Theme
 # https://github.com/ahmetsulek/flat-terminal
@@ -118,100 +195,147 @@ sudo apt-get install fluxgui
 # Prog Languages
 # ###############
 
-echo "Development Languages/Tools"
+dtitle "Development Languages/Tools"
 
 # Install languages and it's tools
-echo "- Installing php, python tools and scala..."
-sudo apt install -y php-all-dev pip virtualenv scala
+dsub "Installing php, python tools and scala..."
+execute sudo apt install -y --allow-unauthenticated \
+    php-all-dev \
+    python-pip \
+    virtualenv \
+    scala
 
 # Nodejs and nvm
-echo "- Installing nodejs and nvm..."
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+dsub "Installing nodejs and nvm..."
+if [ ! $(which node) ]; then
+    dstep "nodejs not found, installing..."
+    execute curl -sLO https://deb.nodesource.com/setup_8.x
+    execute sudo -E bash setup_8.x
+    execute rm setup_8.x
+    execute sudo apt-get install -y nodejs
+    execute curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
+else
+    dstep "nodejs already installed"
+fi
 
 # Install sbt 
-echo "- Installing sbt..."
-echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
-sudo apt-get update
-sudo apt-get install sbt
-sbt -mem 4000
+dsub "Installing sbt..."
+if [ ! -f /etc/apt/sources.list.d/sbt.list ] || [ ! $(which sbt) ]; then
+    dstep "sbt not found, installing..."
+    execute sudo touch /etc/apt/sources.list.d/sbt.list
+    echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
+    execute sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
+    execute sudo apt-get update
+    execute sudo apt-get install -y sbt
+    # sbt -mem 4000
+else
+    dstep "sbt already installed"
+fi
 
 # Graphviz for graph generation
-echo "- Installing graphviz..."
-sudo apt install graphviz
+dsub "Installing graphviz..."
+execute sudo apt install -y graphviz
 
 # PHP Composer
-echo "- Installing php composer..."
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('SHA384', 'composer-setup.php') === '669656bab3166a7aff8a7506b8cb2d1c292f042046c5a994c43155c0be6190fa0355160742ab2e1c88d40d5be660b410') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-sudo mv ./composer.phar /usr/local/bin/composer
-sudo chmod +x /usr/local/bin/composer
+dsub "Installing php composer..."
+if [ ! -f /usr/local/bin/composer ]; then
+    dstep "PHP composer not found, installing..."
+    execute curl -k https://getcomposer.org/installer -o composer-setup.php
+    execute php composer-setup.php
+    execute rm ./composer-setup.php
+    execute sudo mv ./composer.phar /usr/local/bin/composer
+    execute sudo chmod +x /usr/local/bin/composer
+else
+    dstep "PHP composer already installed"
+fi
 
 # For python code fixing and beautify (in atom too)
-echo "- Installing autopep8..."
-pip install --upgrade autopep8 
-sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
+dsub "Installing autopep8..."
+if [ ! -f /home/$USER/.local/bin/autopep8 ]; then
+    dstep "Autopep8 not found, installing..."
+    execute pip install --upgrade autopep8 
+    execute sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
+else
+    dstep "Autopep8 already installed"
+fi
 
 # For php code fixing and beautify (in atom too)
-echo "- Installing php-cs-fixes..."
-curl -L http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
-chmod +x php-cs-fixer
-mv php-cs-fixer /usr/bin/
-
+dsub "Installing php-cs-fixer..."
+if [ ! -f /usr/bin/php-cs-fixer ]; then
+    dstep "php-cs-fixer not found, installing..."
+    execute curl -sL http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar -o php-cs-fixer
+    execute chmod +x php-cs-fixer
+    execute sudo mv php-cs-fixer /usr/bin/
+else
+    dstep "php-cs-fixer already installed"
+fi
 
 # ###############
 # Developer Tools
 # ###############
 
-echo "Developer Tools"
+dtitle "Developer Tools"
 
 # Git Prompt (depends on bash-git-prompt)
-echo "- Installing gitprompt..."
-cd ~
-git clone https://github.com/magicmonty/bash-git-prompt.git .bash-git-prompt --depth=1
-echo "# Git Prompt" >> ~/.bash_profile
-echo "GIT_PROMPT_ONLY_IN_REPO=1" >> ~/.bash_profile
-echo "GIT_PROMPT_THEME=Single_line_Ubuntu" >> ~/.bash_profile
-echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile 
+dsub "Installing gitprompt..."
+if [ ! -d ~/.bash-git-prompt ]; then
+    dstep "gitprompt not found, installing..."
+    cd ~
+    execute git clone https://github.com/magicmonty/bash-git-prompt.git .bash-git-prompt --depth=1
+    echo "# Git Prompt" >> ~/.bash_profile
+    echo "GIT_PROMPT_ONLY_IN_REPO=1" >> ~/.bash_profile
+    echo "GIT_PROMPT_THEME=Single_line_Ubuntu" >> ~/.bash_profile
+    echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile 
+    cd -
+else
+    dstep "gitprompt already installed"
+fi
 
 # Idea
-echo "- Installing IntelliJ Idea Community..."
-mkdir -p ~/Apps/Idea
-wget -O idea-comm.tar.gz https://www.jetbrains.com/idea/download/download-thanks.html?platform=linux&code=IIC
-tar -xf idea-comm.tar.gz -C ~/Apps/Idea --strip 1
+dsub "Installing IntelliJ Idea Community..."
+if [ ! -d ~/Apps/Idea ]; then
+    dstep "IntelliJ Idea not found, installing..."
+    execute mkdir -p ~/Apps/Idea
+    execute wget -qO idea-comm.tar.gz https://www.jetbrains.com/idea/download/download-thanks.html?platform=linux&code=IIC
+    execute tar -xf idea-comm.tar.gz -C ~/Apps/Idea --strip 1
+    execute rm idea-comm.tar.gz
+else
+    dstep "Intellij Idea already installed"
+fi
 
 # Atom
-echo "- Installing Atom..."
-wget -O atom-latest.deb https://atom.io/download/deb
-dpkg -i atom-latest.deb
+dsub "Installing Atom..."
+if [ -z "$(which atom)" ]; then
+    dstep "Atom not found, installing..."
+    execute wget -qO atom-latest.deb https://atom.io/download/deb
+    execute sudo dpkg -i atom-latest.deb
+    execute rm atom-latest.deb
+else
+    dstep "Atom already installed"
+fi
 
-
-# ###############
-# Atom Config
-# ###############
-
-echo "- Configuring Atom..."
+dsub "Configuring Atom..."
 
 if [ -f ~/.atom/keymap.cson ]; then
-  cat <<EOF >> ~/.atom/keymap.cson
-  'atom-text-editor[data-grammar~="vue"]:not([mini])':
-   'tab': 'emmet:expand-abbreviation-with-tab'
+    dstep "Configuring Keymap..."
+    cat <<EOF >> ~/.atom/keymap.cson
+    'atom-text-editor[data-grammar~="vue"]:not([mini])':
+    'tab': 'emmet:expand-abbreviation-with-tab'
 
-  'atom-text-editor[data-grammar~="css"]:not([mini])':
-   'tab': 'emmet:expand-abbreviation-with-tab'
+    'atom-text-editor[data-grammar~="css"]:not([mini])':
+    'tab': 'emmet:expand-abbreviation-with-tab'
 
-  'atom-text-editor[data-grammar~="html"]:not([mini])':
-   'tab': 'emmet:expand-abbreviation-with-tab'
+    'atom-text-editor[data-grammar~="html"]:not([mini])':
+'tab': 'emmet:expand-abbreviation-with-tab'
 EOF
+else
+    dstep "Previous keymap configuration found"
 fi
 
 if [ -f ~/.atom/config.cson ]; then
-  cat <<EOF >> ~/.atom/config.cson
-  "*":
+    dstep "General configuration..."
+    cat <<EOF >> ~/.atom/config.cson
+    "*":
     "atom-beautify":
       js:
         beautify_on_save: true
@@ -251,6 +375,8 @@ if [ -f ~/.atom/config.cson ]; then
     welcome:
       showOnStartup: false
 EOF
+else
+    dstep "Previous atom configuration found"
 fi
 
 
@@ -258,39 +384,37 @@ fi
 # Docker CE
 # ###############
 
-echo "Docker"
+dtitle "Docker"
 
-echo "- Installing Requirements..."
+dsub "Installing Requirements..."
 
-sudo apt-get install -y \
-  linux-image-extra-$(uname -r) \
-  linux-image-extra-virtual \
-  apt-transport-https \
-  ca-certificates \
-  curl \
-  software-properties-common
+execute sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common
    
-echo "- Adding apt-key..."
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+dsub "Adding apt-key..."
+execute apt-key adv --fetch-keys https://download.docker.com/linux/debian/gpg
 
-echo "- Adding reository..."
-sudo add-apt-repository \
- "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
- $(lsb_release -cs) \
- stable"
+dsub "Adding reository..."
+repo="deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+execute sudo touch /etc/apt/sources.list.d/docker.list
+echo $repo | sudo tee -a /etc/apt/sources.list.d/docker.list
 
-echo "- Instaling docker..."
-sudo apt-get update
-sudo apt-get install docker-ce
+dsub "Instaling docker..."
+execute sudo apt-get update
+execute sudo apt-get install -y docker-ce
 
 # Use docker without sudo
-echo "- Allowing user to use docker without sudo..."
-sudo usermod -aG docker $USER
-newgrp
-sudo systemctl restart docker
+dsub "Allowing user to use docker without sudo..."
+execute sudo usermod -aG docker $USER
+execute newgrp
+execute sudo systemctl restart docker
 
 echo
-echo "# ######## #
+echo "# ######## #"
 echo "# FINISHED #"
-echo "# ######## #
+echo "# ######## #"
 echo
