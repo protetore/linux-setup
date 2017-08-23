@@ -295,6 +295,7 @@ else
 fi
 
 # Idea
+# Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle
 dsub "Installing IntelliJ Idea Community..."
 if [ ! -d ~/Apps/Idea ]; then
     dstep "IntelliJ Idea not found, installing..."
