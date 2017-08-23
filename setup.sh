@@ -183,6 +183,44 @@ execute rm xt
 
 # Icons
 # http://0rax0.deviantart.com/art/Uniform-Icon-Theme-453054609
+# OR
+dsub "Installing custom icons..."
+cd /tmp
+git clone https://github.com/numixproject/numix-icon-theme-circle.git
+cd numix-icon-theme-circle
+execute sudo mv Numix-Circle /usr/share/icons
+execute sudo mv Numix-Circle-Light /usr/share/icons
+cd -
+execute rm -r /tmp/numix-icon-theme-circle
+
+# Adapta themes
+dsub "Installing GTK+ theme..."
+execute sudo apt install autoconf automake pkg-config libglib2.0-dev libgdk-pixbuf2.0-dev libsass0 libxml2-utils sassc inkscape
+execute sudo gem install bundle sass
+execute git clone https://github.com/tista500/Adapta.git /tmp/adapta
+cd /tmp/adapta
+execute ./autogen.sh
+execute make
+execute sudo make install
+execute sudo apt purge libsass0 libxml2-utils sassc pkg-config inkscape
+
+# Apply themes
+dsub "Applying themes and icons..."
+gsettings set org.gnome.shell.extensions.user-theme name "Adapta-Nokto"
+gsettings set org.gnome.desktop.interface gtk-theme "Adapta-Nokto"
+gsettings set org.gnome.desktop.interface icon-theme "Numix-Circle"
+# gsettings set org.gnome.desktop.wm.preferences theme "Adwaita"
+
+# Dark theme
+if [ ! -f ~/.config/gtk-3.0/settings.ini ]; then
+    mkdir -p ~/.config/gtk-3.0/settings > /dev/null 2>&1
+    touch ~/.config/gtk-3.0/settings.ini
+    echo "[Settings]" > ~/.config/gtk-3.0/settings.ini
+    echo "gtk-application-prefer-dark-theme=1" > ~/.config/gtk-3.0/settings.ini
+else
+    sed -i "/gtk-application-prefer-dark-theme/d" ~/.config/gtk-3.0/settings.ini
+    sed -i "/\[Settings\]/a gtk-application-prefer-dark-theme=1" ~/.config/gtk-3.0/settings.ini
+fi
 
 # Monitor Color Warmith
 # echo "- Installing flux do control monitor color warmth..."
