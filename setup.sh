@@ -134,6 +134,9 @@ if [ -f ./bash_config ]; then
     . $BASH_CONFIG
 fi
 
+$(sed -i "s/__PERSONAL__/${USER_WORKSPACE}/g" $BASH_CONFIG)
+$(sed -i "s/__COMPANY__/${JOB_WORKSPACE}/g" $BASH_CONFIG)
+
 
 # ###############
 # Customization

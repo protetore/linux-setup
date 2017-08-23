@@ -2,6 +2,17 @@ PERSONAL_WORKSPACE=__PERSONAL__
 JOB_WORKSPACE=__COMPANY__
 
 # #################
+# Helpers
+# #################
+
+show_aliases() {
+   echo "# ############ #"
+   echo "# USER ALIASES #"
+   echo "# ############ #"
+   cat ~/.bash_profile | grep alias | grep -v '#' | grep -v 'show_aliases'
+}
+
+# #################
 # Git helpers
 # #################
 
