@@ -194,7 +194,7 @@ cd -
 execute rm -r /tmp/numix-icon-theme-circle
 
 # Adapta themes
-dsub "Installing GTK+ theme..."
+dsub "Installing GTK+/GnomeShell themes..."
 execute sudo apt install autoconf automake pkg-config libglib2.0-dev libgdk-pixbuf2.0-dev libsass0 libxml2-utils sassc inkscape
 execute sudo gem install bundle sass
 execute git clone https://github.com/tista500/Adapta.git /tmp/adapta
