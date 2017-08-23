@@ -80,7 +80,7 @@ Helpful git aliases (see bash_profile for referenced functions):
 alias gc='git commit -m'
 alias gcm='git add -A && git commit -m'
 alias gp='git pull origin $(git_branch)'
-alias gcb='git checkou -b'
+alias gcb='git checkout -b'
 alias gsave='git add -A && git commit -m "SAVEPOINT"'
 alias gundo='git reset HEAD~ --mixed'
 alias gamend='git commit -a --amend'
