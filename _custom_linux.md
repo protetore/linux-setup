@@ -116,9 +116,13 @@ export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
 
 ## Dev Tools
 
-- Atom
-- IntelliJ Idea Community (Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle)
-- PHP, php-cs-fixer, composer
-- Python, pip, virtualenv, autopep8
-- NodeJS, nvm
-- Scala, sbt
+- IDEs
+    - Atom
+    - IntelliJ Idea Community (Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle)
+    - PyCharm Community (Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle)
+    
+- Langs & Tools
+    - PHP, php-cs-fixer, composer
+    - Python, pip, virtualenv, autopep8
+    - NodeJS, nvm
+    - Scala, sbt
