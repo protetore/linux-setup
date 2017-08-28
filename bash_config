@@ -9,11 +9,19 @@ show_aliases() {
    echo "# ############ #"
    echo "# USER ALIASES #"
    echo "# ############ #"
-   cat ~/.bash_profile | grep alias | grep -v '#' | grep -v 'show_aliases'
+   cat ~/.bash_profile | \
+           grep alias | \
+           grep -v grep | \
+           grep -v show_alias | \
+           grep -v cats | \
+           sed "s/^alias //" | \
+           sed -E "s/(=)(.*)/ -> \2/" | \
+           awk -F"->" '{ printf "%-8s -> %s\n", $1, $2 }' | \
+           egrep --color -w "^[a-zA-Z]{1,} "
 }
 
 # #################
-# Git helpers
+# Git Helpers
 # #################
 
 # Ensure current branch is up-to-date with remote
