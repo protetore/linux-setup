@@ -230,6 +230,7 @@ fi
 # https://extensions.gnome.org/extension/1011/dynamic-panel-transparency/
 # https://extensions.gnome.org/extension/1031/topicons/
 # https://extensions.gnome.org/extension/484/workspace-grid/
+dsub "Installing gnome-shell extensions..."
 base_url="https://extensions.gnome.org"
 gv=$(gnome-shell --version | cut -d' ' -f3)
 dest="$HOME/.local/share/gnome-shell/extensions/"
@@ -239,6 +240,7 @@ for ext in ${EXTENSIONS[@]}; do
     details=$(curl "$info_url")
     downUrl="${base_url}$(echo "$details" | sed -e 's/.*"download_url": "\([^"]*\)".*/\1/')"
     uuid="$(echo "$details" | sed -e 's/.*"uuid": "\([^"]*\)".*/\1/')"
+    dstep "Installing ${uuid} (${ext})..."
     thisDest="${dest}${uuid}"
     temp=$(mktemp -d)
     trap "rm -rfv $temp" EXIT
@@ -250,21 +252,27 @@ for ext in ${EXTENSIONS[@]}; do
 done
 
 # Gnome Activities Menu Icon
+dsub "Setting gnome activities icon..."
 mkdir -p ~/Pictures/Icons
-cp $BASEDIR/gnome_bar_icon.png ${HOME}/Pictures/Icons/
+cp $BASEDIR/resources/gnome_bar_icon.png ${HOME}/Pictures/Icons/
 dconf write /org/gnome/shell/extensions/activities-config/activities-config-button-icon-path "${HOME}/Pictures/Icons/gnome_bar_icon.png"
 dconf write /org/gnome/shell/extensions/activities-config/activities-config-button-no-text true
 dconf write /org/gnome/shell/extensions/activities-config/activities-icon-padding 8
 dconf write /org/gnome/shell/extensions/activities-config/activities-text-padding 8
 
 # Desktop and login screen wallpapers
+dsub "Configuring login screen, lock screen and desktop background..."
 mkdir -p ~/Pictures/Wallpapers
-cp $BASEDIR/*wallpaper* ${HOME}/Pictures/Wallpapers/
+cp $BASEDIR/resources/*wallpaper* ${HOME}/Pictures/Wallpapers/
 gsettings set org.gnome.desktop.background picture-uri file:///${HOME}/Pictures/Wallpapers/death_star_wallpaper.jpg
 
 # Autosave Session
+dsub "Enabling auto-save session..."
 dconf write /org/gnome/gnome-session/auto-save-session true
 dconf write /org/gnome/gnome-session/auto-save-session-one-shot true
+
+dsub "Changing grub background..."
+cp $BASEDIR/resources/grub* /usr/share/desktop-base/softwaves-theme/grub/
 
 # Monitor Color Warmith
 # echo "- Installing flux do control monitor color warmth..."
@@ -361,6 +369,7 @@ fi
 
 dtitle "Developer Tools"
 
+# Git
 # Git Prompt (depends on bash-git-prompt)
 dsub "Installing gitprompt..."
 if [ ! -d ~/.bash-git-prompt ]; then
@@ -375,6 +384,11 @@ if [ ! -d ~/.bash-git-prompt ]; then
 else
     dstep "gitprompt already installed"
 fi
+
+# Improve Git Diff
+# diff-so-fancy (https://github.com/so-fancy/diff-so-fancy)
+dsub "Installing diff-so-fancy..."
+execute curl -skL -o diff-so-fancy https://raw.githubusercontent.com/so-fancy/diff-so-fancy/master/third_party/build_fatpack/diff-so-fancy
 
 # Idea
 # Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle
