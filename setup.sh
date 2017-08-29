@@ -81,15 +81,16 @@ execute sudo apt install -y --allow-unauthenticated \
     numix-icon-theme \
     build-essential \
     dirmngr \
-    owncloud-client
-  
+    owncloud-client \
+    jq
+
 # Ubuntu only
 # sudo apt install -y \
 #     gnome gnome-shell \
 #     numix-folders \
 #     numix-blue-gtk-theme \
 #     opera-stable \
-#     slack-desktop 
+#     slack-desktop
 
 # Pure debian: Needs to add opera repo
 dsub "Installing Opera..."
@@ -116,16 +117,16 @@ dtitle "Command Line Customizations"
 
 dsub "Configuring bash and command aliases..."
 BASH_CONFIG=""
-if [ -f ~/.bash_profile ]; then 
+if [ -f ~/.bash_profile ]; then
     BASH_CONFIG=~/.bash_profile
-elif [ -f ~/.bash_profile ]; then 
+elif [ -f ~/.bash_profile ]; then
     BASH_CONFIG=~/.profile
-elif [ -f ~/.bash_profile ]; then 
+elif [ -f ~/.bash_profile ]; then
     BASH_CONFIG=~/.bashrc
 fi
 
 if [ "$BASH_CONFIG" == "" ]; then
-    derror "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"  
+    derror "[ERR] Not configuring custom prompt: no config file found (.bash_profile, .profile, .bashrc)"
     exit 1
 fi
 
@@ -176,9 +177,9 @@ dsub "Customizing default terminal colors..."
 # wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
 # wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
 # Freya:
-execute wget -qO xt http://git.io/v3D4o 
-execute chmod +x xt 
-execute ./xt 
+execute wget -qO xt http://git.io/v3D4o
+execute chmod +x xt
+execute ./xt
 execute rm xt
 
 # Icons
@@ -222,6 +223,49 @@ else
     sed -i "/\[Settings\]/a gtk-application-prefer-dark-theme=1" ~/.config/gtk-3.0/settings.ini
 fi
 
+# Gnome-shell Extensions
+# https://extensions.gnome.org/extension/358/activities-configurator/
+# https://extensions.gnome.org/extension/15/alternatetab/
+# https://extensions.gnome.org/extension/885/dynamic-top-bar/
+# https://extensions.gnome.org/extension/1011/dynamic-panel-transparency/
+# https://extensions.gnome.org/extension/1031/topicons/
+# https://extensions.gnome.org/extension/484/workspace-grid/
+base_url="https://extensions.gnome.org"
+gv=$(gnome-shell --version | cut -d' ' -f3)
+dest="$HOME/.local/share/gnome-shell/extensions/"
+EXTENSIONS=( 358 15 885 1011 1031 484 )
+for ext in ${EXTENSIONS[@]}; do
+    info_url="${base_url}/extension-info/?pk=${ext}&shell_version=${gv}"
+    details=$(curl "$info_url")
+    downUrl="${base_url}$(echo "$details" | sed -e 's/.*"download_url": "\([^"]*\)".*/\1/')"
+    uuid="$(echo "$details" | sed -e 's/.*"uuid": "\([^"]*\)".*/\1/')"
+    thisDest="${dest}${uuid}"
+    temp=$(mktemp -d)
+    trap "rm -rfv $temp" EXIT
+    curl -L "$url" > "$temp/e.zip"
+    unzip "$temp/e.zip" -d "$dest"
+    rm -rfv "$temp"
+    trap '' EXIT
+    gnome-shell-extension-tool --enable-extension="$uuid"
+done
+
+# Gnome Activities Menu Icon
+mkdir -p ~/Pictures/Icons
+cp $BASEDIR/gnome_bar_icon.png ${HOME}/Pictures/Icons/
+dconf write /org/gnome/shell/extensions/activities-config/activities-config-button-icon-path "${HOME}/Pictures/Icons/gnome_bar_icon.png"
+dconf write /org/gnome/shell/extensions/activities-config/activities-config-button-no-text true
+dconf write /org/gnome/shell/extensions/activities-config/activities-icon-padding 8
+dconf write /org/gnome/shell/extensions/activities-config/activities-text-padding 8
+
+# Desktop and login screen wallpapers
+mkdir -p ~/Pictures/Wallpapers
+cp $BASEDIR/*wallpaper* ${HOME}/Pictures/Wallpapers/
+gsettings set org.gnome.desktop.background picture-uri file:///${HOME}/Pictures/Wallpapers/death_star_wallpaper.jpg
+
+# Autosave Session
+dconf write /org/gnome/gnome-session/auto-save-session true
+dconf write /org/gnome/gnome-session/auto-save-session-one-shot true
+
 # Monitor Color Warmith
 # echo "- Installing flux do control monitor color warmth..."
 # execute sudo add-apt-repository ppa:nathan-renniewaldock/flux
@@ -231,7 +275,7 @@ fi
 # [MACOS] Terminal/iTerm Flat Theme
 # https://github.com/ahmetsulek/flat-terminal
 
-  
+
 # ###############
 # Prog Languages
 # ###############
@@ -259,7 +303,7 @@ else
     dstep "nodejs already installed"
 fi
 
-# Install sbt 
+# Install sbt
 dsub "Installing sbt..."
 if [ ! -f /etc/apt/sources.list.d/sbt.list ] || [ ! $(which sbt) ]; then
     dstep "sbt not found, installing..."
@@ -294,7 +338,7 @@ fi
 dsub "Installing autopep8..."
 if [ ! -f /home/$USER/.local/bin/autopep8 ]; then
     dstep "Autopep8 not found, installing..."
-    execute pip install --upgrade autopep8 
+    execute pip install --upgrade autopep8
     execute sudo ln -s /home/$user/.local/bin/autopep8 /usr/bin/autopep8
 else
     dstep "Autopep8 already installed"
@@ -326,7 +370,7 @@ if [ ! -d ~/.bash-git-prompt ]; then
     echo "# Git Prompt" >> ~/.bash_profile
     echo "GIT_PROMPT_ONLY_IN_REPO=1" >> ~/.bash_profile
     echo "GIT_PROMPT_THEME=Single_line_Ubuntu" >> ~/.bash_profile
-    echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile 
+    echo "source ~/.bash-git-prompt/gitprompt.sh" >> ~/.bash_profile
     cd -
 else
     dstep "gitprompt already installed"
@@ -362,7 +406,7 @@ if [ -f ~/.atom/keymap.cson ]; then
     dstep "Configuring Keymap..."
     sed -E '/^# begin-protetore-linux-setup/,/^# end-protetore-linux-setup/d' /.atom/keymap.cson
     cat <<EOF >> ~/.atom/keymap.cson
-    
+
 # begin:protetore-linux-setup
 'atom-text-editor[data-grammar~="vue"]:not([mini])':
  'tab': 'emmet:expand-abbreviation-with-tab'
@@ -373,7 +417,7 @@ if [ -f ~/.atom/keymap.cson ]; then
 'atom-text-editor[data-grammar~="html"]:not([mini])':
  'tab': 'emmet:expand-abbreviation-with-tab'
 # end:protetore-linux-setup
-     
+
 EOF
 else
     dstep "Previous keymap configuration found"
@@ -383,7 +427,7 @@ if [ -f ~/.atom/config.cson ]; then
     dstep "General configuration..."
     sed -E '/^# begin-protetore-linux-setup/,/^# end-protetore-linux-setup/d' ~/.atom/config.cson
     cat <<EOF >> ~/.atom/config.cson
-    
+
 # begin:protetore-linux-setup
 "*":
 "atom-beautify":
@@ -446,7 +490,7 @@ execute sudo apt-get install -y \
     curl \
     gnupg2 \
     software-properties-common
-   
+
 dsub "Adding apt-key..."
 execute apt-key adv --fetch-keys https://download.docker.com/linux/debian/gpg
 
