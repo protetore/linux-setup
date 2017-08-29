@@ -360,15 +360,20 @@ dsub "Configuring Atom..."
 
 if [ -f ~/.atom/keymap.cson ]; then
     dstep "Configuring Keymap..."
+    sed -E '/^# begin-protetore-linux-setup/,/^# end-protetore-linux-setup/d' /.atom/keymap.cson
     cat <<EOF >> ~/.atom/keymap.cson
-    'atom-text-editor[data-grammar~="vue"]:not([mini])':
-    'tab': 'emmet:expand-abbreviation-with-tab'
+    
+# begin:protetore-linux-setup
+'atom-text-editor[data-grammar~="vue"]:not([mini])':
+ 'tab': 'emmet:expand-abbreviation-with-tab'
 
-    'atom-text-editor[data-grammar~="css"]:not([mini])':
-    'tab': 'emmet:expand-abbreviation-with-tab'
+'atom-text-editor[data-grammar~="css"]:not([mini])':
+ 'tab': 'emmet:expand-abbreviation-with-tab'
 
-    'atom-text-editor[data-grammar~="html"]:not([mini])':
-'tab': 'emmet:expand-abbreviation-with-tab'
+'atom-text-editor[data-grammar~="html"]:not([mini])':
+ 'tab': 'emmet:expand-abbreviation-with-tab'
+# end:protetore-linux-setup
+     
 EOF
 else
     dstep "Previous keymap configuration found"
@@ -376,47 +381,52 @@ fi
 
 if [ -f ~/.atom/config.cson ]; then
     dstep "General configuration..."
+    sed -E '/^# begin-protetore-linux-setup/,/^# end-protetore-linux-setup/d' ~/.atom/config.cson
     cat <<EOF >> ~/.atom/config.cson
-    "*":
-    "atom-beautify":
-      js:
-        beautify_on_save: true
-      json:
-        beautify_on_save: true
-      less:
-        beautify_on_save: true
-      markdown:
-        beautify_on_save: true
-      nginx:
-        beautify_on_save: true
-      php:
-        beautify_on_save: true
-      python:
-        beautify_on_save: true
-      sass:
-        beautify_on_save: true
-      scss:
-        beautify_on_save: true
-      vue:
-        beautify_on_save: true
-      xml:
-        beautify_on_save: true
-      yaml:
-        beautify_on_save: true
-    core:
-      autoHideMenuBar: true
-      telemetryConsent: "no"
-      themes: [
-        "one-dark-ui"
-        "firewatch-syntax"
-      ]
-    editor:
-      fontFamily: "Fira Code"
-    "exception-reporting":
-      userId: "1fe51ccf-b1c7-4e08-9d74-bbe684d2fa1e"
-    welcome:
-      showOnStartup: false
+    
+# begin:protetore-linux-setup
+"*":
+"atom-beautify":
+  js:
+    beautify_on_save: true
+  json:
+    beautify_on_save: true
+  less:
+    beautify_on_save: true
+  markdown:
+    beautify_on_save: true
+  nginx:
+    beautify_on_save: true
+  php:
+    beautify_on_save: true
+  python:
+    beautify_on_save: true
+  sass:
+    beautify_on_save: true
+  scss:
+    beautify_on_save: true
+  vue:
+    beautify_on_save: true
+  xml:
+    beautify_on_save: true
+  yaml:
+    beautify_on_save: true
+core:
+  autoHideMenuBar: true
+  telemetryConsent: "no"
+  themes: [
+    "one-dark-ui"
+    "firewatch-syntax"
+  ]
+editor:
+  fontFamily: "Fira Code"
+"exception-reporting":
+  userId: "1fe51ccf-b1c7-4e08-9d74-bbe684d2fa1e"
+welcome:
+  showOnStartup: false
+# end:protetore-linux-setup
 EOF
+
 else
     dstep "Previous atom configuration found"
 fi
