@@ -115,7 +115,21 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: ['hyper-snazzy'],
+  plugins: [
+    'hyper-snazzy',
+    'hyperterm-overlay',
+    //'hyper-terminal-tabs',
+    'hyperline',
+    'hyperlinks',
+    //'hyper-statusline',
+    //'hyperterm-mactabs'
+    //'hyperterm-transparent-bg'
+    'hyper-tabs-enhanced',
+    'hyperterm-dibdabs',
+    'hyper-autohide-tabs',
+    'hyper-transparent-dynamic',
+    'hyperminimal'
+  ],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
@@ -125,5 +139,34 @@ module.exports = {
   keymaps: {
     // Example
     // 'window:devtools': 'cmd+alt+o',
-  }
+  },
+
+  hyperTabs: {
+    tabIconsColored: true,
+    activityColor: 'salmon',
+    closeAlign: 'right',
+    trafficButtons: true
+  },
+
+  overlay: {
+    alwaysOnTop: true,
+    animate: true,
+    hasShadow: false,
+    hideDock: false,
+    hideOnBlur: false,
+    hotkeys: ['Option+Space'],
+    position: 'top',
+    primaryDisplay: false,
+    resizable: true,
+    startAlone: true,
+    startup: true,
+    size: 0.7,
+    tray: true,
+    unique: true
+  },
+
+  hyperTransparentDynamic: {
+    alpha: 0.8 // default 50%
+  },
+
 };

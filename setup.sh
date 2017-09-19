@@ -77,6 +77,8 @@ execute sudo apt install -y --allow-unauthenticated \
     docky \
     php7.0 \
     dconf-cli \
+    zsh \
+    zsh-syntax-highlighting \
     numix-gtk-theme \
     numix-icon-theme \
     build-essential \
@@ -123,6 +125,13 @@ elif [ -f ~/.bash_profile ]; then
     BASH_CONFIG=~/.profile
 elif [ -f ~/.bash_profile ]; then
     BASH_CONFIG=~/.bashrc
+else
+    touch ~/.bashrc
+    BASH_CONFIG=~/.bashrc
+fi
+
+if [ ! -f ~/.zshrc ]; then
+    touch ~/.zshrc
 fi
 
 if [ "$BASH_CONFIG" == "" ]; then
@@ -130,13 +139,17 @@ if [ "$BASH_CONFIG" == "" ]; then
     exit 1
 fi
 
-if [ -f ./bash_config ]; then
-    cp ./bash_config $BASH_CONFIG
-    . $BASH_CONFIG
-fi
+cp ./terminal/aliases ~/terminal/.aliases
+cp ./terminal/bash_extra ~/.bash_extra
+cp ./terminal/zsh_extra ~/.zsh_extra
+
+echo "source ~/.bash_extra" >> $BASH_CONFIG
+echo "source ~/.zsh_extra" >> ~/.zshrc
 
 $(sed -i "s/__PERSONAL__/${USER_WORKSPACE}/g" $BASH_CONFIG)
 $(sed -i "s/__COMPANY__/${JOB_WORKSPACE}/g" $BASH_CONFIG)
+
+. $BASH_CONFIG
 
 
 # ###############
@@ -169,13 +182,13 @@ else
     dstep "Tilda already configured"
 fi
 
+# Install Hyper Terminal
+execute curl -L https://releases.hyper.is/download/deb -o /tmp/hyper.deb
+execute sudo dpkg -i /tmp/hyper.deb
+cp ./terminal/hyper.js ~/.hyper.js
+
 # Flat colors terminal (ex.: 33 (Dracula))
 dsub "Customizing default terminal colors..."
-# wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh
-# wget -O xt https://git.io/v7eBS && chmod +x xt && ./xt && rm xt # Gruvbox Dark
-# wget -O xt  http://git.io/vs7Ut && chmod +x xt && ./xt && rm xt # One Dark
-# wget -O xt  http://git.io/v3D4z && chmod +x xt && ./xt && rm xt # Flat
-# wget -O xt  http://git.io/v3D8e && chmod +x xt && ./xt && rm xt # Dracula
 # Freya:
 execute wget -qO xt http://git.io/v3D4o
 execute chmod +x xt
@@ -274,6 +287,21 @@ dconf write /org/gnome/gnome-session/auto-save-session-one-shot true
 dsub "Changing grub background..."
 cp $BASEDIR/resources/grub* /usr/share/desktop-base/softwaves-theme/grub/
 
+dsub "Configuring ZSH Theme..."
+execute sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+execute git clone https://github.com/sindresorhus/pure.git /tmp/pure
+cd /tmp/pure
+execute sudo ln -s "$PWD/pure.zsh" /usr/local/share/zsh/site-functions/prompt_pure_setup
+execute sudo ln -s "$PWD/async.zsh" /usr/local/share/zsh/site-functions/async
+cd -
+$(sed -i "s/ZSH_THEME.*/ZSH_THEME=""/g" ~/.zshrc)
+echo "autoload -U promptinit; promptinit" >> ~/.zshrc
+echo "prompt pure" >> ~/.zshrc
+echo "" >> ~/.zshrc
+
+dsub "Configuring ZSH Syntax Highlight..."
+echo "source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+
 # Monitor Color Warmith
 # echo "- Installing flux do control monitor color warmth..."
 # execute sudo add-apt-repository ppa:nathan-renniewaldock/flux
@@ -298,14 +326,17 @@ execute sudo apt install -y --allow-unauthenticated \
     virtualenv \
     scala
 
-# Nodejs and nvm
+# Nodejs, nvm and yarn
 dsub "Installing nodejs and nvm..."
 if [ ! $(which node) ]; then
     dstep "nodejs not found, installing..."
     execute curl -sLO https://deb.nodesource.com/setup_8.x
     execute sudo -E bash setup_8.x
     execute rm setup_8.x
-    execute sudo apt-get install -y nodejs
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    execute sudo apt-get update
+    execute sudo apt-get install -y nodejs yarn
     execute curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
 else
     dstep "nodejs already installed"
