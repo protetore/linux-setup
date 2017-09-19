@@ -1,0 +1,22 @@
+# Useful git aliases
+alias gc='git commit -m'
+alias gcm='git add -A && git commit -m'
+alias gp='git pull origin $(git_branch)'
+alias gcb='git checkout -b'
+alias gsave='git add -A && git commit -m "SAVEPOINT"'
+alias gundo='git reset HEAD~ --mixed'
+alias gamend='git commit -a --amend'
+alias gwipe='git add -A && git commit -qm "WIPE SAVEPOINT" && git reset HEAD~1 --hard'
+alias gclean='git_clean'
+alias gdone='git_done'
+
+# Docker aliases
+alias drun="docker run --net=${DOCKER_NET} --dns-search=${DOCKER_NET}"
+
+# Locations aliases
+alias w="cd $W"
+alias p="cd $W/${PERSONAL_WORKSPACE}"
+alias ww="cd $WW"
+
+# SSH aliases
+alias tunnel="ssh -f -N -L 9999:second.hostaddress.com:5432 user@first.hostaddress.com"

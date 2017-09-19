@@ -1,0 +1,94 @@
+PERSONAL_WORKSPACE=__PERSONAL__
+JOB_WORKSPACE=__COMPANY__
+
+# Helpers
+# ---------------------
+
+show_aliases() {
+   echo "# ---------------------"
+   echo "# USER ALIASES "
+   echo "# ---------------------"
+   cat ~/.aliases | \
+           grep alias | \
+           grep -v grep | \
+           grep -v show_alias | \
+           grep -v cats | \
+           sed "s/^alias //" | \
+           sed -E "s/(=)(.*)/ -> \2/" | \
+           awk -F"->" '{ printf "%-8s -> %s\n", $1, $2 }' | \
+           egrep --color -w "^[a-zA-Z]{1,} "
+}
+
+
+# Git Helpers
+# ---------------------
+
+# Ensure current branch is up-to-date with remote
+git_up() {
+    git pull --rebase --prune --autostash $@ git submodule update --init --recursive
+}
+
+# Update master and rebase current branch from it
+git_update(){
+    git checkout master && git pull && git checkout - && git rebase master
+}
+
+# Reset local only commits (keep the changes)
+git_undo(){
+    git reset HEAD~ --mixed
+}
+
+# Display git branch in the prompt
+git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+
+# Deletes all branches already merged into master
+git_clean() {
+    git branch --merged ${1-master} | grep -v " ${1-master}$" | xargs -r git branch -d;
+}
+
+# Completing a work: runs git up to bring master and update it and remove branches already merged into master
+git_done() {
+    git checkout ${1-master} && git_up && git_clean ${1-master};
+}
+
+# Custom Prompt
+# ---------------------
+
+# Git Prompt Package
+GIT_PROMPT_ONLY_IN_REPO=1
+GIT_PROMPT_THEME=Protetore_Minimalist
+source ~/.bash-git-prompt/gitprompt.sh
+
+# Default without gitprompt
+# export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
+# export PS1=$'\[\033[1;34m\]\W\[\033[33m\]$(git_branch)\[\033[00m\]\[\033[1;33m\] \u2192 \[\033[00m\]'
+export PS1=$'\[\033[00m\]\W\[\033[33m\]$(git_branch)\[\033[00m\]\[\033[1;33m\] \u2192 \[\033[00m\]'
+
+
+# Shortcuts/Options
+# ---------------------
+
+# History search shorcuts (arrow keys)
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\e0A": history-search-backward'
+bind '"\e0B": history-search-forward'
+
+# Docker local dev network so containers can communicate by name
+export DOCKER_NET=dev
+
+# Shorcuts
+export W=~/Workspace/
+export WORKSPACE=$W
+export WW=$W/${JOB_WORKSPACE}/
+
+# Warning: SSH will stop warning you if server hash changes, use carefully
+SSH_OPTS=" -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null "
+
+# Aliases
+# ---------------------
+if [ -f ~/.aliases ]; then
+    . ~/.aliases
+fi
