@@ -1,0 +1,15 @@
+#-----------------
+# Work Config
+#-----------------
+
+JOB_WORKSPACE=__COMPANY__
+export WW=$W/${JOB_WORKSPACE}/
+
+#-----------------
+# Work Aliases
+#-----------------
+alias ww="cd $WW"
+
+#-----------------
+# Work Helpers
+#-----------------

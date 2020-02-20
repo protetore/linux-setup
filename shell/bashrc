@@ -1,0 +1,39 @@
+#-----------------
+# Custom Prompt
+#-----------------
+
+export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
+
+#-----------------
+# Other Settings
+#-----------------
+
+# History search shorcuts (arrow keys)
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+bind '"\e0A": history-search-backward'
+bind '"\e0B": history-search-forward'
+
+#-----------------
+# Includes
+#-----------------
+
+# Load Variables
+if [ -f ~/.definition ]; then
+    source ~/.definition
+fi
+
+# Load Aliases
+if [ -f ~/.aliases ]; then
+    source ~/.aliases
+fi
+
+# Load Helper Functions
+if [ -f ~/.helpers ]; then
+    source ~/.helpers
+fi
+
+# Work Related Helper Functions
+if [ -f ~/.work ]; then
+    source ~/.work
+fi

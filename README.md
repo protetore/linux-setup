@@ -1,6 +1,6 @@
 # Linux Customizarion
 
-My current list of customization done on a Debian distro.
+My current list of customization done on a Debian based distro.
 
 ## Automation
 
@@ -10,7 +10,15 @@ You can execute the _setup.sh_ script found on this folder:
 bash setup.sh
 ```
 
-## Gnome shell extensions
+## Customizing this Setup
+
+- config
+- scripts
+- shell
+
+## Included Customizations
+
+### Gnome shell extensions
 
 - Activities Configurator [<https://extensions.gnome.org/extension/358/activities-configurator/>]
 - Alternate Tab [<https://extensions.gnome.org/extension/15/alternatetab/>]
@@ -19,7 +27,7 @@ bash setup.sh
 - Native Window Placement [<https://extensions.gnome.org/extension/18/native-window-placement/>
 - User Themes [<https://extensions.gnome.org/extension/19/user-themes/>]
 
-## Theme
+### Theme
 
 **Current**
 
@@ -57,7 +65,7 @@ gsettings set org.gnome.desktop.interface icon-theme "Numix-Circle"
 - Gnome Shell Theme: Numix (on Ubuntu: sudo apt install numix-gtk-theme) [<https://numixproject.org>]
 - Icons: Numix Circle Light (on Ubuntu: sudo apt install numix-icon-theme-circle) [<https://numixproject.org>]
 
-## Dock
+### Dock
 
 **docky** with:
 
@@ -65,7 +73,7 @@ gsettings set org.gnome.desktop.interface icon-theme "Numix-Circle"
 - Recent Documents
 - Weather
 
-## Terminal
+### Terminal
 
 Flat Terminal Colors with Freya Theme [<https://github.com/Mayccoll/Gogh>]
 
@@ -78,11 +86,11 @@ Tilda Drop Down Terminal
 - `sudo apt install tilda`
 - byobu as starting cmd
 
-## Fonts
+### Fonts
 
 Development: **FiraCode**
 
-## Monitor Color Warmith
+### Monitor Color Warmith
 
 ```sh
 sudo add-apt-repository ppa:nathan-renniewaldock/flux
@@ -90,7 +98,7 @@ sudo apt-get update
 sudo apt-get install fluxgui
 ```
 
-## Browsers
+### Browsers
 
 - **Firefox**
 
@@ -102,7 +110,7 @@ sudo apt-get install fluxgui
 
 - **Opera**
 
-## Comand Aliases
+### Comand Aliases
 
 Helpful git aliases (see bash_profile for referenced functions):
 
@@ -134,12 +142,14 @@ alias gdone='git_done'
     wip = !git add -u && git commit -m "WIP"
     undo = reset HEAD~1 --mixed
     amend = commit -a --amend
+    remaster = git remote update -p && git rebase origin/master
     wipe = !git add -A && git commit -qm 'WIPE SAVEPOINT' && git reset HEAD~1 --hard
     clean = "!f() { git branch --merged ${1-master} | grep -v " ${1-master}$" | xargs -r git branch -d; }; f"
     done = "!f() { git checkout ${1-master} && git up && git bclean ${1-master}; }; f"
+    change-commits = "!f() { VAR1=$1; VAR='$'$1; OLD=$2; NEW=$3; echo \"Are you sure for replace $VAR $OLD => $NEW ?(Y/N)\";read OK;if [ \"$OK\" = 'Y' ] ; then shift 3; git filter-branch --env-filter \"if [ \\\"${VAR}\\\" = '$OLD' ]; then export $VAR1='$NEW';echo 'to $NEW'; fi\" $@; fi;}; f "
 ```
 
-## Custom Promt
+### Custom Promt
 
 Display the git branch on terminal prompt:
 
@@ -147,17 +157,17 @@ Display the git branch on terminal prompt:
 export PS1="\u@\h \[\033[1;34m\]\W\[\033[33m\]\$(git_branch)\[\033[00m\] $ "
 ```
 
-## Dev Tools
+### Dev Tools
 
 - IDEs
 
-  - Atom
+  - Visual Studio Code
   - IntelliJ Idea Community (Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle)
-  - PyCharm Community (Plugins: Material UI Theme, Darcula Syntax Theme, Main menu Toggle)
 
 - Langs & Tools
 
-  - PHP, php-cs-fixer, composer
+  - Go Lang
   - Python, pip, virtualenv, autopep8
   - NodeJS, nvm
+  - PHP, php-cs-fixer, composer
   - Scala, sbt

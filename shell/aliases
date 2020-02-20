@@ -1,0 +1,29 @@
+#-----------------
+# Workspace
+#-----------------
+alias w="cd $W"
+
+#-----------------
+# Git Aliases
+#-----------------
+if [ ! "$(basename $SHELL)" = "zsh" ]; then
+    alias gc='git commit -m'
+    alias gcm='git add -A && git commit -m'
+    alias gp='git pull origin $(git_branch)'
+    alias gcb='git checkout -b'
+    alias gsave='git add -A && git commit -m "SAVEPOINT"'
+    alias gundo='git reset HEAD~ --mixed'
+    alias gamend='git commit -a --amend'
+    alias gremaster='git remote update -p && git rebase origin/master'
+    alias gwipe='git add -A && git commit -qm "WIPE SAVEPOINT" && git reset HEAD~1 --hard'
+    alias gclean='git_clean'
+    alias gdone='git_done'
+    alias gsync-fork='git fetch upstream && git merge upstream/master && git push origin master'
+fi
+
+#-----------------
+# Docker
+#-----------------
+alias drun="docker run --net=${DOCKER_NET} --dns-search=${DOCKER_NET}"
+
+

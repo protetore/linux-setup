@@ -1,0 +1,31 @@
+#-----------------
+# Includes
+#-----------------
+
+# Load Variables
+if [ -f ~/.definition ]; then
+    source ~/.definition
+fi
+
+# Load Aliases
+if [ -f ~/.aliases ]; then
+    source ~/.aliases
+fi
+
+# Load Helper Functions
+if [ -f ~/.helpers ]; then
+    source ~/.helpers
+fi
+
+# Work Related Helper Functions
+if [ -f ~/.work ]; then
+    source ~/.work
+fi
+
+# ZSH only extras
+if [ -f ~/.zsh_extra ]; then
+    source ~/.zsh_extra
+fi
+
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

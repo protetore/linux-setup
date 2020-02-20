@@ -1,0 +1,9 @@
+#-----------------
+# Config
+#-----------------
+export W=~/Workspace/
+export WORKSPACE=$W
+export DOCKER_NET=dev
+
+# Warning: SSH will stop warning you if server hash changes, use carefully
+SSH_OPTS=" -o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null "

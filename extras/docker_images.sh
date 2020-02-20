@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-DOCKER_NET=dev
+source ~/.definition
+
 DOCKER_NET_ADDR=10.99.10.0/24
 
 # Use docker without sudo
